@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { supabase } from '../supabaseClient'; // Pastikan path ini benar
 import { useRouter } from 'next/navigation';
-import { User } from '@supabase/supabase-js';
+import { User, RealtimeChannel } from '@supabase/supabase-js';
 import { Send, MessageSquare, Layout, Briefcase, CheckCircle, Clock, Calendar, LogOut, User as UserIcon, Plus, X, Upload, CreditCard, Star, ChevronRight, Shield } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';

@@ -7,7 +7,7 @@ import { Scale, ShieldCheck, Gavel, Calendar, MessageSquare, Phone, Quote, Chevr
 import { useAuth } from './AuthSessionProvider';
 import { supabase } from './supabaseClient';
 import { ThemeToggle } from './ThemeToggle';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, Variants } from 'framer-motion';
 
 // --- DATA ---
 const testimonials = [
@@ -114,7 +114,7 @@ const lawyers = [
 ];
 
 // --- VARIAN ANIMASI ---
-const containerVariants = {
+const containerVariants: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
@@ -124,7 +124,7 @@ const containerVariants = {
   },
 };
 
-const itemVariants = {
+const itemVariants: Variants = {
   hidden: { y: 30, opacity: 0 },
   visible: { y: 0, opacity: 1, transition: { duration: 0.6, ease: "easeOut" } },
 };

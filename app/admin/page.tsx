@@ -3,12 +3,12 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { supabase } from '../supabaseClient';
 import { useRouter } from 'next/navigation';
-import { User } from '@supabase/supabase-js';
+import { User, RealtimeChannel } from '@supabase/supabase-js';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
-import { LogOut, Phone, MessageSquare, ShieldCheck, Search, Bell, X, Send, Users, Activity, FileText, Calendar as CalendarIcon, List, Paperclip, Star, ChevronRight, Briefcase, TrendingUp, RealtimeChannel } from 'lucide-react';
+import { LogOut, Phone, MessageSquare, ShieldCheck, Search, Bell, X, Send, Users, Activity, FileText, Calendar as CalendarIcon, List, Paperclip, Star, ChevronRight, Briefcase, TrendingUp } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ThemeToggle } from '../ThemeToggle';
@@ -125,7 +125,7 @@ export default function AdminDashboard() {
         .subscribe((status) => {
           if (!isMounted) return;
           if (status === 'CLOSED') return; // Abaikan jika memang sengaja ditutup
-          if (status !== 'SUBSCRIBED' && status !== 'JOINED') {
+          if (status !== 'SUBSCRIBED') {
             console.error("Gagal terhubung ke Realtime:", status);
           }
         });
