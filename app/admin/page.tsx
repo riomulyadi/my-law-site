@@ -8,7 +8,7 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
-import { LogOut, Phone, MessageSquare, ShieldCheck, Search, Bell, X, Send, Users, Activity, FileText, Calendar as CalendarIcon, List, Paperclip, Star, ChevronRight, Briefcase, TrendingUp } from 'lucide-react';
+import { LogOut, Phone, MessageSquare, ShieldCheck, Search, Bell, X, Send, Users, Activity, FileText, Calendar as CalendarIcon, List, Paperclip, Star, ChevronRight, Briefcase, TrendingUp, RealtimeChannel } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ThemeToggle } from '../ThemeToggle';
@@ -28,7 +28,7 @@ export default function AdminDashboard() {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [viewMode, setViewMode] = useState<'table' | 'calendar'>('table');
   const router = useRouter();
-  const adminChannelRef = useRef<any>(null);
+  const adminChannelRef = useRef<RealtimeChannel | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const activeChatRef = useRef<string | null>(null);
 
@@ -64,6 +64,7 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     let isMounted = true;
+    let channel: RealtimeChannel | null = null;
 
     const checkAdmin = async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -81,12 +82,8 @@ export default function AdminDashboard() {
       fetchAllBookings();
       fetchMessages();
       
-      // Pastikan channel lama dihapus sebelum membuat yang baru untuk mencegah error "after subscribe"
-      supabase.removeChannel(supabase.channel('law-chat-channel'));
-
       // Setup Realtime Subscription
-      // Gunakan variabel lokal untuk konfigurasi sebelum ditugaskan ke Ref
-      const channel = supabase
+      channel = supabase
         .channel('law-chat-channel')
         .on(
           'postgres_changes',
@@ -126,7 +123,9 @@ export default function AdminDashboard() {
           updateTypingStatus();
         })
         .subscribe((status) => {
-          if (status !== 'SUBSCRIBED') {
+          if (!isMounted) return;
+          if (status === 'CLOSED') return; // Abaikan jika memang sengaja ditutup
+          if (status !== 'SUBSCRIBED' && status !== 'JOINED') {
             console.error("Gagal terhubung ke Realtime:", status);
           }
         });
@@ -139,11 +138,8 @@ export default function AdminDashboard() {
     return () => {
       isMounted = false;
       // Hapus channel berdasarkan referensi jika sudah terisi
-      if (adminChannelRef.current) {
-        supabase.removeChannel(adminChannelRef.current);
-      }
-      // Hapus berdasarkan nama untuk memastikan tidak ada channel "berhantu" jika proses async belum selesai
-      supabase.removeChannel(supabase.channel('law-chat-channel'));
+      if (channel) supabase.removeChannel(channel);
+      if (adminChannelRef.current) supabase.removeChannel(adminChannelRef.current);
     };
   }, [router]);
 

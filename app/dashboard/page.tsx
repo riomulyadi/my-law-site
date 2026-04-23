@@ -184,7 +184,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     let isMounted = true;
-    let updateChannel: any = null;
+    let updateChannel: RealtimeChannel | null = null;
     let typingTimeout: NodeJS.Timeout;
 
     const getUser = async () => {
@@ -196,10 +196,6 @@ export default function DashboardPage() {
         setUser(user);
         fetchBookings(user.id);
         fetchMessages();
-        
-        // Bersihkan channel yang mungkin tertinggal dari render sebelumnya
-        supabase.removeChannel(supabase.channel(`user-updates-${user.id}`));
-        supabase.removeChannel(supabase.channel('law-chat-channel'));
 
         // Setup Realtime Subscription untuk update status
         updateChannel = supabase
@@ -247,7 +243,6 @@ export default function DashboardPage() {
       isMounted = false;
       if (updateChannel) supabase.removeChannel(updateChannel);
       if (chatChannelRef.current) supabase.removeChannel(chatChannelRef.current);
-      supabase.removeChannel(supabase.channel('law-chat-channel'));
     };
   }, [router]);
 
